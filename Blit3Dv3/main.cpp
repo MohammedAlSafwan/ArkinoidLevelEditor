@@ -198,16 +198,35 @@ void solveMap()
 	//Start counting the time it takes to solve the puzzle
 	auto start = std::chrono::high_resolution_clock::now();
 
+	//return a text discriping if the path was found or not
 	infoTxt = map->findEnd() ?
 		"Found the end \nx =" + std::to_string(map->exit.x) + "\n y = " + std::to_string(map->exit.y) + "\n Steps = " + std::to_string(map->counter) :
 		"Couldn't find the end.";
 
+	//Finish counting
 	auto finish = std::chrono::high_resolution_clock::now();
+	//Print the time needed to find the game
 	std::cout << std::chrono::duration_cast<std::chrono::microseconds>(finish - start).count() << " ns\n";
 }
 
 void DeInit(void)
 {
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+	// Method				:	void DeInit(void) 
+	//
+	// Method parameters	:	
+	//
+	// Method return		:	void
+	//
+	// Synopsis				:   Try to solve the puzzle and print output to the console and the screen.
+	//							
+	//
+	// Modifications		:
+	//								Date			 Developer				   Notes
+	//								----			 ---------			 	   -----
+	//							Oct 5, 2018		  Mohammed Al-Safwan		Initial setup
+	//
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 	if (camera != NULL) delete camera;
 	if (map != NULL) map->~MazMap();
 
