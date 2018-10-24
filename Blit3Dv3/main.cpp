@@ -29,7 +29,40 @@ MazMap *map; //bricks for a level
 void initSprits();
 void initFont();
 void initMaze();
-void initCamera();
+void initCamera()
+{
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+	// Method				:	void initCamera() 
+	//
+	// Method parameters	:	
+	//
+	// Method return		:	void
+	//
+	// Synopsis				:   initilize the camera.
+	//							
+	//
+	// Modifications		:
+	//								Date			 Developer				   Notes
+	//								----			 ---------			 	   -----
+	//							Oct 5, 2018		  Mohammed Al-Safwan		Initial setup
+	//
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+	//make a camera
+	camera = new Camera2D();
+
+	//set it's valid pan area
+	//camera->minX = blit3D->screenWidth / 2;
+	//camera->minY = blit3D->screenHeight / 2;
+	//camera->maxX = blit3D->screenWidth * 2 - blit3D->screenWidth / 2;
+	//camera->maxY = blit3D->screenHeight / 2 + 400;
+	camera->minX = blit3D->screenWidth / 2;
+	camera->minY = blit3D->screenHeight / 2;
+	camera->maxX = map->mazWidth * TILE_WIDTH;
+	camera->maxY = map->mazHeight * TILE_HEIGHT;
+
+	camera->PanTo(blit3D->screenWidth / 2, blit3D->screenHeight / 2);
+	//camera->PanTo(map->rover.x * TILE_WIDTH, map->rover.y * TILE_WIDTH);
+}
 void solveMap();
 void drawFont();
 void drawMap();
@@ -95,7 +128,7 @@ void initSprits()
 			spriteList.push_back(blit3D->MakeSprite(x * TILE_WIDTH, y * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, "Media\\BRICKS.png"));
 }
 
-void initFont() 
+void initFont()
 {
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 	// Method				:	void initFont() 
@@ -116,6 +149,7 @@ void initFont()
 	//load an Angelcode binary32 font file
 	font = blit3D->MakeAngelcodeFontFromBinary32("Media\\CaviarDreams57.bin");
 }
+
 void initMaze()
 {
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -140,37 +174,6 @@ void initMaze()
 	map->LoadMap("Alex_test_map1024.txt");
 	//map->LoadMap("Dav_test_map.txt");
 	//map->LoadMap("Ryan_test_map.txt");
-}
-
-void initCamera()
-{
-	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-	// Method				:	void initCamera() 
-	//
-	// Method parameters	:	
-	//
-	// Method return		:	void
-	//
-	// Synopsis				:   initilize the camera.
-	//							
-	//
-	// Modifications		:
-	//								Date			 Developer				   Notes
-	//								----			 ---------			 	   -----
-	//							Oct 5, 2018		  Mohammed Al-Safwan		Initial setup
-	//
-	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-	//make a camera
-	camera = new Camera2D();
-
-	//set it's valid pan area
-	camera->minX = blit3D->screenWidth / 2;
-	camera->minY = blit3D->screenHeight / 2;
-	camera->maxX = blit3D->screenWidth * 2 - blit3D->screenWidth / 2;
-	camera->maxY = blit3D->screenHeight / 2 + 400;
-
-	camera->PanTo(blit3D->screenWidth / 2, blit3D->screenHeight / 2);
-	//camera->PanTo(map->rover.x * TILE_WIDTH, map->rover.y * TILE_WIDTH);
 }
 
 void solveMap()
@@ -227,7 +230,11 @@ void DeInit(void)
 	//							Oct 5, 2018		  Mohammed Al-Safwan		Initial setup
 	//
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+	//Delete camera
 	if (camera != NULL) delete camera;
+
+	//Delete map
 	if (map != NULL) map->~MazMap();
 
 	// DO NOT delete the font!
@@ -238,6 +245,23 @@ void DeInit(void)
 
 void Update(double seconds)
 {
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+	// Method				:	void Update(double seconds)
+	//
+	// Method parameters	:	
+	//
+	// Method return		:	void
+	//
+	// Synopsis				:   Update the camera and the map.
+	//							
+	//
+	// Modifications		:
+	//								Date			 Developer				   Notes
+	//								----			 ---------			 	   -----
+	//							Oct 5, 2018		  Mohammed Al-Safwan		Initial setup
+	//
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
 	//elapsedTime += seconds;
 	//if (elapsedTime >= timeStep)
 	//{
@@ -247,11 +271,31 @@ void Update(double seconds)
 	//	}
 	//	//advance rover
 	//}
+
+	//Update the camera
 	camera->Update((float)seconds);
 }
 
 void Draw(void)
 {
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+	// Method				:	void Draw(void)
+	//
+	// Method parameters	:	
+	//
+	// Method return		:	void
+	//
+	// Synopsis				:   Draw the camera, map, fond, and square under cursor.
+	//							
+	//
+	// Modifications		:
+	//								Date			 Developer				   Notes
+	//								----			 ---------			 	   -----
+	//							Oct 5, 2018		  Mohammed Al-Safwan		Initial setup
+	//
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+	//clear screen before drawing
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);	//clear colour: r,g,b,a 	
 	// wipe the drawing surface clear
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -259,10 +303,16 @@ void Draw(void)
 	//MUST draw camera first!
 	camera->Draw();
 
+	//make sure the rover is set before panning the camera
 	if (map->rover.x != -1 || map->rover.y != -1)
 	{
+		//offX = map->rover.x;
+		//offY = map->rover.y;
+		//Pan the camera to the rover location
 		camera->PanTo(map->rover.x * TILE_WIDTH, map->rover.y * TILE_WIDTH);
 	}
+
+	//Draw the map.
 	drawMap();
 
 	//undraw the camera so the font doesn't move out of the screen
@@ -276,17 +326,38 @@ void Draw(void)
 	float y = ((int)(cursor.y + offY) / TILE_HEIGHT) * TILE_HEIGHT;
 	//draw cursor
 	spriteList[(int)editBrick]->Blit(x, y);
+	
 }
 
 void drawMap()
 {
-	int x = 0;
-	int y = offY;
-	//printf("Y = %d\n", y);
-	//printf("X = %d\n", x);
-	for (; y < (offY + MAX_DRAW_Y); y++)
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+	// Method				:	void Update(double seconds)
+	//
+	// Method parameters	:	
+	//
+	// Method return		:	void
+	//
+	// Synopsis				:   Update the camera and the map.
+	//							
+	//
+	// Modifications		:
+	//								Date			 Developer				   Notes
+	//								----			 ---------			 	   -----
+	//							Oct 5, 2018		  Mohammed Al-Safwan		Initial setup
+	//
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+	//int x = 0;
+	//int y = offY;
+	int maxX = (map->rover.x + MAX_DRAW_X > map->mazWidth) ? map->mazWidth - 1 : map->rover.x + MAX_DRAW_X;
+	int y = (map->rover.y - MAX_DRAW_Y < 0) ? 0 : map->rover.y - MAX_DRAW_Y;
+	int maxY = (map->rover.y + MAX_DRAW_Y > map->mazHeight) ? map->mazHeight - 1 : map->rover.x + MAX_DRAW_Y;
+
+	for (; y < maxX; y++)
 	{
-		for (x = offX; x < (offX + MAX_DRAW_X); x++)
+		int x = (map->rover.x - MAX_DRAW_X < 0) ? 0 : map->rover.x - MAX_DRAW_X;
+
+		for (; x < maxY; x++)
 		{
 			if (y >= map->tileList.size() || (x >= map->tileList[0].size()))
 			{
@@ -305,9 +376,14 @@ void drawMap()
 			}
 		}
 	}
+
 	if (map->exit.x != -1 && map->exit.y != -1)
 	{
 		spriteList[(int)TileEnum::END]->Blit(map->exit.x * TILE_WIDTH, map->exit.y * TILE_HEIGHT);
+	}
+	if (map->rover.x != -1 && map->rover.y != -1)
+	{
+		spriteList[(int)TileEnum::ROVER]->Blit(map->rover.x * TILE_WIDTH, map->rover.y * TILE_HEIGHT);
 	}
 	//printf("Y = %d\n", y);
 	//printf("X = %d\n", x);
@@ -317,12 +393,44 @@ void drawMap()
 
 void drawFont()
 {
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+	// Method				:	void drawFont()
+	//
+	// Method parameters	:	
+	//
+	// Method return		:	void
+	//
+	// Synopsis				:   Update the camera and the map.
+	//							
+	//
+	// Modifications		:
+	//								Date			 Developer				   Notes
+	//								----			 ---------			 	   -----
+	//							Oct 5, 2018		  Mohammed Al-Safwan		Initial setup
+	//
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 	font->BlitText(50.f, 1040.f, infoTxt);
 }
 
 //the key codes/actions/mods for DoInput are from GLFW: check its documentation for their values
 void DoInput(int key, int scancode, int action, int mods)
 {
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+	// Method				:	void DoInput(int key, int scancode, int action, int mods)
+	//
+	// Method parameters	:	
+	//
+	// Method return		:	void
+	//
+	// Synopsis				:   Update the camera and the map.
+	//							
+	//
+	// Modifications		:
+	//								Date			 Developer				   Notes
+	//								----			 ---------			 	   -----
+	//							Oct 5, 2018		  Mohammed Al-Safwan		Initial setup
+	//
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		blit3D->Quit(); //start the shutdown sequence
 
@@ -399,6 +507,22 @@ void DoInput(int key, int scancode, int action, int mods)
 
 void DoCursor(double x, double y)
 {
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+	// Method				:	void DoCursor(double x, double y)
+	//
+	// Method parameters	:	
+	//
+	// Method return		:	void
+	//
+	// Synopsis				:   Update the camera and the map.
+	//							
+	//
+	// Modifications		:
+	//								Date			 Developer				   Notes
+	//								----			 ---------			 	   -----
+	//							Oct 5, 2018		  Mohammed Al-Safwan		Initial setup
+	//
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 	//demonstrates how to convert the raw cursor coords passed from the OS
 	//into Blit3D screenspace coords
 	cursor.x = x * (blit3D->screenWidth / blit3D->trueScreenWidth);
@@ -407,6 +531,22 @@ void DoCursor(double x, double y)
 
 void DoMouseButton(int button, int action, int mods)
 {
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+	// Method				:	void DoMouseButton(int button, int action, int mods)
+	//
+	// Method parameters	:	
+	//
+	// Method return		:	void
+	//
+	// Synopsis				:   Update the camera and the map.
+	//							
+	//
+	// Modifications		:
+	//								Date			 Developer				   Notes
+	//								----			 ---------			 	   -----
+	//							Oct 5, 2018		  Mohammed Al-Safwan		Initial setup
+	//
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
 	{
 		//quantize cursor
@@ -455,6 +595,22 @@ void DoMouseButton(int button, int action, int mods)
 
 int main(int argc, char *argv[])
 {
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+	// Method				:	int main(int argc, char *argv[])
+	//
+	// Method parameters	:	
+	//
+	// Method return		:	void
+	//
+	// Synopsis				:   Update the camera and the map.
+	//							
+	//
+	// Modifications		:
+	//								Date			 Developer				   Notes
+	//								----			 ---------			 	   -----
+	//							Oct 5, 2018		  Mohammed Al-Safwan		Initial setup
+	//
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 	//memory leak detection
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
